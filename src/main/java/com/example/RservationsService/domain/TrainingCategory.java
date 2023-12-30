@@ -20,14 +20,25 @@ public class TrainingCategory {
     private Long id;
     private String category; // powerlifting, pilates, kalistenika, joga, itd
     private int price;
-
-    @ManyToOne
-    @JoinColumn(name = "trainingType_id")
-    private TrainingType trainingType;
+    private String type;
+    private int capacity;
 
     @OneToMany(mappedBy = "trainingCategory")
-    private Set<HallXTrainingCategory> hallXTrainingCategorySet = new HashSet<>();
+    private Set<Hall> halls;
 
+    @OneToMany(mappedBy = "trainingCategory")
+    private Set<Appointment> appointments = new HashSet<>();
+
+
+    public TrainingCategory(String category, int price, String type) {
+        this.category = category;
+        this.price = price;
+        this.type = type;
+        if(type == "group")
+            this.capacity = 12;
+        else if(type == "individual")
+            this.capacity = 1;
+    }
 
     public TrainingCategory() {}
 

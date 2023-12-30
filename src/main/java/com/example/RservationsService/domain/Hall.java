@@ -18,15 +18,23 @@ public class Hall {
     private int managerID;
     private String description;
     private int numberOfTrainers;
+
+    @ManyToOne
+    @JoinColumn(name = "trainingCategory_id")
+    private TrainingCategory trainingCategory;
+
     @OneToMany(mappedBy = "hall")
-    private Set<HallXTrainingCategory> hallTrainingCategories = new HashSet<>();
+    private Set<Appointment> appointments = new HashSet<>();
 
 
-    public Hall( String name, int managerID, String description, int numberOfTrainers) {
+    public Hall(String name, String description, int numberOfTrainers, TrainingCategory trainingCategory) {
         this.name = name;
-        this.managerID = managerID;
         this.description = description;
         this.numberOfTrainers = numberOfTrainers;
+        this.trainingCategory = trainingCategory;
+    }
+
+    public Hall() {
     }
 
 
