@@ -9,6 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
 
@@ -19,8 +22,15 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.appointmentMapper = appointmentMapper;
     }
     @Override
-    public Page<AppointmentDto> findAllAppointments(Pageable pageable) {
-        return appointmentRepository.findAll(pageable)
-                .map(appointmentMapper::appointmentToAppointmentDto);
+    public List<AppointmentDto> findAllAppointments() {
+        //return appointmentRepository.findAll(pageable)
+                //.map(appointmentMapper::appointmentToAppointmentDto);
+
+        //return Page<AppointmentDto> where are only appointments with isAvailability = true
+        return appointmentRepository.findAll().stream().map(appointmentMapper::appointmentToAppointmentDto)
+                .filter(appointmentDto -> appointmentDto.isAvailability() == true)
+                .collect(Collectors.toList());
+
+
     }
 }

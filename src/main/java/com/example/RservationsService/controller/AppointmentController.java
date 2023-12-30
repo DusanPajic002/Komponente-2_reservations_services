@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/appointments")
 public class AppointmentController {
@@ -24,7 +26,7 @@ public class AppointmentController {
 
     @Operation(summary = "Get all clients")
     @GetMapping
-    public ResponseEntity<Page<AppointmentDto>> getAllAppointments(Pageable pageable) {
-        return new ResponseEntity<>(appointmentService.findAllAppointments(pageable), HttpStatus.OK);
+    public ResponseEntity<List<AppointmentDto>> getAllAppointments() {
+        return new ResponseEntity<>(appointmentService.findAllAppointments(), HttpStatus.OK);
     }
 }
