@@ -34,7 +34,7 @@ public class TestDataRunner implements CommandLineRunner {
     public void run(String... args) throws Exception {
         //String category, int price, String type
         TrainingCategory trainingCategory1 = new TrainingCategory("powerlifting", 1000, "individual");
-        TrainingCategory trainingCategory2 = new TrainingCategory("pilates", 2000, "group");
+            TrainingCategory trainingCategory2 = new TrainingCategory("pilates", 2000, "group");
         TrainingCategory trainingCategory3 = new TrainingCategory("calistenics", 3000, "individual");
         TrainingCategory trainingCategory4 = new TrainingCategory("joga", 4000, "group");
 

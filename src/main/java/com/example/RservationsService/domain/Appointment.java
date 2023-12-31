@@ -12,12 +12,13 @@ public class Appointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long appointmentID;
+    private Long ID;
 
     private String startTime;
     @Column(name = "day_of_week")
     private String day;
     private boolean availability; // slobodan/zauzet
+    private int capacity;
 
 
 
@@ -36,9 +37,16 @@ public class Appointment {
         this.availability = availability;
         this.trainingCategory = trainingCategory;
         this.hall = hall;
+        if(trainingCategory.getType() == "group")
+            this.capacity = 12;
+        else if(trainingCategory.getType() == "individual")
+            this.capacity = 1;
     }
 
     public Appointment() {
     }
 
+    public void increaseCapacity() {
+        this.capacity--;
+    }
 }

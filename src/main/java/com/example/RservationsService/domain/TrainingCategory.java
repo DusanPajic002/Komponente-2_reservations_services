@@ -21,7 +21,6 @@ public class TrainingCategory {
     private String category; // powerlifting, pilates, kalistenika, joga, itd
     private int price;
     private String type;
-    private int capacity;
 
     @OneToMany(mappedBy = "trainingCategory")
     private Set<Hall> halls;
@@ -34,12 +33,11 @@ public class TrainingCategory {
         this.category = category;
         this.price = price;
         this.type = type;
-        if(type == "group")
-            this.capacity = 12;
-        else if(type == "individual")
-            this.capacity = 1;
+
     }
 
     public TrainingCategory() {}
+
+
 
 }

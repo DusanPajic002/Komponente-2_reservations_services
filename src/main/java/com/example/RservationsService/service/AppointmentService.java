@@ -9,4 +9,7 @@ import java.util.List;
 public interface AppointmentService {
 
     List<AppointmentDto> findAllAppointments();
+
+    int updateTrainingCapacity(AppointmentDto appointmentID);
+
 }
