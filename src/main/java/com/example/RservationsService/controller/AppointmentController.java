@@ -2,6 +2,7 @@ package com.example.RservationsService.controller;
 
 
 import com.example.RservationsService.dto.AppointmentDto;
+import com.example.RservationsService.dto.FilterDto;
 import com.example.RservationsService.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,12 @@ public class AppointmentController {
     @GetMapping
     public ResponseEntity<List<AppointmentDto>> getAllAppointments() {
         return new ResponseEntity<>(appointmentService.findAllAppointments(), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all clients")
+    @PostMapping("/filter")
+    public ResponseEntity<List<AppointmentDto>> filterAppointments(@RequestBody FilterDto filterDto) {
+        return new ResponseEntity<>(appointmentService.filterAppointments(filterDto), HttpStatus.OK);
     }
 
     @Operation(summary = "Update clinet trainings")
