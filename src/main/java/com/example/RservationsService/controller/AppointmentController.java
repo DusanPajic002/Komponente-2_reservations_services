@@ -22,7 +22,6 @@ public class AppointmentController {
     public AppointmentController(AppointmentService appointmentService) {
         this.appointmentService = appointmentService;
     }
-
     @Operation(summary = "Get all clients")
     @GetMapping
     public ResponseEntity<List<AppointmentDto>> getAllAppointments() {

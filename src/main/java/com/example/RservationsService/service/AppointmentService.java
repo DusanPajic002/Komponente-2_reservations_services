@@ -1,6 +1,7 @@
 package com.example.RservationsService.service;
 
 import com.example.RservationsService.dto.AppointmentDto;
+import com.example.RservationsService.dto.CategoryDto;
 import com.example.RservationsService.dto.FilterDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,5 +14,7 @@ public interface AppointmentService {
 
     int updateTrainingCapacity(AppointmentDto appointmentID);
     List<AppointmentDto> filterAppointments (FilterDto filterDto);
+
+    List<CategoryDto> getCategory();
 
 }

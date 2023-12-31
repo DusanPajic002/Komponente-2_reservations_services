@@ -2,10 +2,14 @@ package com.example.RservationsService.service.impl;
 
 
 import com.example.RservationsService.domain.Appointment;
+import com.example.RservationsService.domain.TrainingCategory;
 import com.example.RservationsService.dto.AppointmentDto;
+import com.example.RservationsService.dto.CategoryDto;
 import com.example.RservationsService.dto.FilterDto;
 import com.example.RservationsService.mapper.AppointmentMapper;
+import com.example.RservationsService.mapper.CategoryMapper;
 import com.example.RservationsService.repository.AppointmentRepository;
+import com.example.RservationsService.repository.TrainingCategoryRepository;
 import com.example.RservationsService.service.AppointmentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,11 +23,17 @@ import java.util.stream.Collectors;
 public class AppointmentServiceImpl implements AppointmentService {
 
     private AppointmentRepository appointmentRepository;
+    private TrainingCategoryRepository trainingCategoryRepository;
     private AppointmentMapper appointmentMapper;
-    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, AppointmentMapper appointmentMapper) {
+    private CategoryMapper categoryMapper;
+
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository, TrainingCategoryRepository trainingCategoryRepository, AppointmentMapper appointmentMapper, CategoryMapper categoryMapper) {
         this.appointmentRepository = appointmentRepository;
+        this.trainingCategoryRepository = trainingCategoryRepository;
         this.appointmentMapper = appointmentMapper;
+        this.categoryMapper = categoryMapper;
     }
+
     @Override
     public List<AppointmentDto> findAllAppointments() {
         return appointmentRepository.findAll().stream().map(appointmentMapper::appointmentToAppointmentDto)
@@ -44,33 +54,20 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public List<AppointmentDto> filterAppointments(FilterDto filterDto) {
-
         List<AppointmentDto>  filtered = appointmentRepository.findAll().stream().map(appointmentMapper::appointmentToAppointmentDto)
                 .filter(appointmentDto -> appointmentDto.isAvailability() == true).collect(Collectors.toList());
-
         if(!filterDto.getCategory().equals("ignore"))
           filtered = filtered.stream().filter(appointmentDto -> appointmentDto.getTrainingCategory().equals(filterDto.getCategory())).collect(Collectors.toList());
-
         if(!filterDto.getDay().equals("ignore"))
           filtered = filtered.stream().filter(appointmentDto -> appointmentDto.getDay().equals(filterDto.getDay())).collect(Collectors.toList());
-
         if(!filterDto.getType().equals("ignore"))
           filtered = filtered.stream().filter(appointmentDto -> appointmentDto.getTrainingType().equals(filterDto.getType())).collect(Collectors.toList());
-
         return filtered;
     }
 
-}
+    @Override
+    public List<CategoryDto> getCategory() {
+        return trainingCategoryRepository.findAll().stream().map(categoryMapper::categoryToCategoryDto).collect(Collectors.toList());
+    }
 
-//        if(!filterDto.getCategory().equals("ignore")){
-//            List<AppointmentDto>  f = appointmentRepository.findAll().stream().map(appointmentMapper::appointmentToAppointmentDto)
-//                    .filter(appointmentDto -> appointmentDto.getTrainingCategory().equals(filterDto.getCategory()))
-//                    .collect(Collectors.toList());
-//        }
-//        //filtriraj mi po danu osim ako je dan ponedeljak
-//        if(!filterDto.getDay().equals("ignore")){
-//            List<AppointmentDto>  f = appointmentRepository.findAll().stream().map(appointmentMapper::appointmentToAppointmentDto)
-//                    .filter(appointmentDto -> appointmentDto.isAvailability() == true)
-//                    .filter(appointmentDto -> appointmentDto.getDay().equals(filterDto.getDay()))
-//                    .collect(Collectors.toList());
-//        }
+}
