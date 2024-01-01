@@ -1,7 +1,9 @@
 package com.example.RservationsService.controller;
 
 
+import com.example.RservationsService.dto.AppointmentCreateDto;
 import com.example.RservationsService.dto.AppointmentDto;
+import com.example.RservationsService.dto.ClientAppointmentDto;
 import com.example.RservationsService.dto.FilterDto;
 import com.example.RservationsService.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,9 +25,9 @@ public class AppointmentController {
         this.appointmentService = appointmentService;
     }
     @Operation(summary = "Get all clients")
-    @GetMapping
-    public ResponseEntity<List<AppointmentDto>> getAllAppointments() {
-        return new ResponseEntity<>(appointmentService.findAllAppointments(), HttpStatus.OK);
+    @PostMapping("/all")
+    public ResponseEntity<List<AppointmentDto>> getAllAppointments(@RequestBody Long id) {
+        return new ResponseEntity<>(appointmentService.findAllAppointments(id), HttpStatus.OK);
     }
 
     @Operation(summary = "Get all clients")
@@ -36,8 +38,15 @@ public class AppointmentController {
 
     @Operation(summary = "Update clinet trainings")
     @PutMapping("/updateClientTrainings")
-    public ResponseEntity<Integer> updateClientTrainings(@RequestBody AppointmentDto appointmentDto) {
-        return new ResponseEntity<>(appointmentService.updateTrainingCapacity(appointmentDto), HttpStatus.OK);
+    public ResponseEntity<Integer> updateClientTrainings(@RequestBody ClientAppointmentDto clientAppointmentDto) {
+        return new ResponseEntity<>(appointmentService.updateTrainingCapacity(clientAppointmentDto), HttpStatus.OK);
     }
+
+
+//    @Operation(summary = "Add appointment")
+//    @PostMapping("/addAppointment")
+//    public ResponseEntity<AppointmentDto> updateClientTrainings(@RequestBody AppointmentCreateDto appointmentCreateDto) {
+//        return new ResponseEntity<>(appointmentService.addAppointment(appointmentCreateDto), HttpStatus.OK);
+//    }
 
 }

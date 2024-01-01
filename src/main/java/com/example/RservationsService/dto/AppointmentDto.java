@@ -22,6 +22,7 @@ public class AppointmentDto {
 
     private String hallDescription;
 
+
     public AppointmentDto(Long id, String startTime, String day, boolean availability, String trainingCategory, String trainingType, String hall, String hallDescription) {
         this.id = id;
         this.startTime = startTime;
