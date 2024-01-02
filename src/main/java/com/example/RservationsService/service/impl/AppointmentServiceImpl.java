@@ -33,21 +33,15 @@ import java.util.stream.Collectors;
 public class AppointmentServiceImpl implements AppointmentService {
 
     private AppointmentRepository appointmentRepository;
-    private TrainingCategoryRepository trainingCategoryRepository;
+    private MessageHelper messageHelper;
     private AppointmentMapper appointmentMapper;
-    private CategoryMapper categoryMapper;
-
-    private RestTemplate clientServiceRestTemplate;
-
     private ClientAppointmentMapper clientAppointmentMapper;
-
     private ClientAppointmentRepository clientAppointmentRepository;
-
+    private TrainingCategoryRepository trainingCategoryRepository;
+    private CategoryMapper categoryMapper;
+    private RestTemplate clientServiceRestTemplate;
     @Autowired
     private JmsTemplate jmsTemplate;
-
-    private MessageHelper messageHelper;
-
     private String schedulingMessage;
     private String canceledAppointmentMessage;
 
@@ -84,6 +78,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     public int updateTrainingCapacity(ClientAppointmentDto clientAppointmentDto) {
         Appointment appointment = appointmentRepository.findById(clientAppointmentDto.getAppointmentId()).orElse(null);
         int price = appointment.getTrainingCategory().getPrice();
+
         ResponseEntity<Integer> numberOfTrainings = clientServiceRestTemplate.exchange("/client/numberOfTrainings",
                 HttpMethod.PUT, new HttpEntity<>(clientAppointmentDto.getClientId()), Integer.class);
         if (numberOfTrainings.getStatusCode().is2xxSuccessful()){
@@ -164,5 +159,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return -appointment.getTrainingCategory().getPrice();
     }
+
 
 }

@@ -15,7 +15,7 @@ public class Hall {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private int managerID;
+    private Long managerID = 0L;
     private String description;
     private int numberOfTrainers;
 
@@ -37,5 +37,16 @@ public class Hall {
     public Hall() {
     }
 
-
+    @Override
+    public String toString() {
+        return "Hall{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", managerID=" + managerID +
+                ", description='" + description + '\'' +
+                ", numberOfTrainers=" + numberOfTrainers +
+                ", trainingCategory=" + trainingCategory +
+                ", appointments=" + appointments +
+                '}';
+    }
 }
