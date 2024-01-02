@@ -34,6 +34,10 @@ public class ClientAppointmentDto {
         return "ClientAppointmentDto{" +
                 "clientId=" + clientId +
                 ", appointmentId=" + appointmentId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", username='" + username + '\'' +
                 '}';
     }
 }

@@ -9,12 +9,11 @@ import java.util.List;
 public interface AppointmentService {
 
     List<AppointmentDto> findAllAppointments(Long clientId);
-
-    int updateTrainingCapacity(ClientAppointmentDto appointmentID);
+    int updateTrainingCapacity(ClientAppointmentDto clientAppointmentDto);
     List<AppointmentDto> filterAppointments (FilterDto filterDto);
-
     List<CategoryDto> getCategory();
-
     AppointmentDto addAppointment(AppointmentCreateDto appointmentCreateDto);
+    List<AppointmentDto> getCleintAppointment (String cleintId);
+    int cancelAppointment(ClientAppointmentDto clientAppointmentDto);
 
 }

@@ -49,10 +49,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     private MessageHelper messageHelper;
 
     private String schedulingMessage;
+    private String canceledAppointmentMessage;
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, TrainingCategoryRepository trainingCategoryRepository, AppointmentMapper appointmentMapper,
                                   CategoryMapper categoryMapper, RestTemplate clientServiceRestTemplate, ClientAppointmentMapper clientAppointmentMapper,
-                                  ClientAppointmentRepository clientAppointmentRepository, MessageHelper messageHelper, @Value("${destination.schedulingMessage}") String schedulingMessage) {
+                                  ClientAppointmentRepository clientAppointmentRepository, MessageHelper messageHelper,@Value("${destination.schedulingMessage}") String schedulingMessage,
+                                  @Value("${destination.cancelSchedulingMessage}") String canceledAppointmentMessage) {
         this.appointmentRepository = appointmentRepository;
         this.trainingCategoryRepository = trainingCategoryRepository;
         this.appointmentMapper = appointmentMapper;
@@ -62,12 +64,12 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.clientAppointmentRepository = clientAppointmentRepository;
         this.messageHelper = messageHelper;
         this.schedulingMessage = schedulingMessage;
+        this.canceledAppointmentMessage = canceledAppointmentMessage;
     }
 
     @Override
     public List<AppointmentDto> findAllAppointments(Long clientId) {
         List<ClientAppointment> clientAppointments = clientAppointmentRepository.findByClientID(clientId);
-
         Set<Long> clientAppointmentIds = clientAppointments.stream()
                 .map(clientAppointment -> clientAppointment.getAppointment().getID())
                 .collect(Collectors.toSet());
@@ -90,7 +92,6 @@ public class AppointmentServiceImpl implements AppointmentService {
                 System.out.printf("Client not found");
                 return 0;
             }
-
             if(numberOfTrainings.getBody() != null && numberOfTrainings.getBody() % 2 == 0) // promeni %2 na %10
                 price = 0;
         } else{
@@ -99,14 +100,9 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         clientAppointmentRepository.save(clientAppointmentMapper.clientAppointmentDtoToClientAppointment(clientAppointmentDto.getClientId(),appointment));
-
-        appointment.increaseCapacity();
-        if(appointment.getCapacity() == 0)
-            appointment.setAvailability(false);
-        System.out.println(appointment.getCapacity() + " capacity");
+        appointment.increaseCapacity(-1);
         appointmentRepository.save(appointment);
 
-        //String firstName, String lastName, String email, String hallName, String day, String time
         NotificationCreateDto nDto = new NotificationCreateDto(clientAppointmentDto.getFirstName(), clientAppointmentDto.getLastName(),
                 clientAppointmentDto.getEmail(), appointment.getHall().getName(), appointment.getDay(), appointment.getStartTime(), clientAppointmentDto.getUsername());
         jmsTemplate.convertAndSend(schedulingMessage, messageHelper.createTextMessage(nDto));
@@ -115,8 +111,17 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public List<AppointmentDto> filterAppointments(FilterDto filterDto) {
+
+        List<ClientAppointment> clientAppointments = clientAppointmentRepository.findByClientID(filterDto.getClientId());
+        Set<Long> clientAppointmentIds = clientAppointments.stream()
+                .map(clientAppointment -> clientAppointment.getAppointment().getID())
+                .collect(Collectors.toSet());
+
         List<AppointmentDto>  filtered = appointmentRepository.findAll().stream().map(appointmentMapper::appointmentToAppointmentDto)
-                .filter(appointmentDto -> appointmentDto.isAvailability() == true).collect(Collectors.toList());
+                .filter(appointmentDto -> appointmentDto.isAvailability() == true)
+                .filter(appointmentDto -> !clientAppointmentIds.contains(appointmentDto.getId()))
+                .collect(Collectors.toList());
+
         if(!filterDto.getCategory().equals("ignore"))
           filtered = filtered.stream().filter(appointmentDto -> appointmentDto.getTrainingCategory().equals(filterDto.getCategory())).collect(Collectors.toList());
         if(!filterDto.getDay().equals("ignore"))
@@ -134,6 +139,30 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public AppointmentDto addAppointment(AppointmentCreateDto appointmentCreateDto) {
         return null;
+    }
+
+    @Override
+    public List<AppointmentDto> getCleintAppointment(String cleintId) {
+        return clientAppointmentRepository.findByClientID(Long.parseLong(cleintId))
+                .stream().map(clientAppointment -> appointmentMapper.appointmentToAppointmentDto(clientAppointment.getAppointment()))
+                .collect(Collectors.toList());
+    }
+    @Override
+    public int cancelAppointment(ClientAppointmentDto clientAppointmentDto) {
+       ClientAppointment clientAppointment = clientAppointmentRepository.findByAppointmentIDAndClientID(clientAppointmentDto.getAppointmentId(), clientAppointmentDto.getClientId());
+       clientAppointmentRepository.delete(clientAppointment);
+       Appointment appointment = appointmentRepository.findById(clientAppointmentDto.getAppointmentId()).orElse(null);
+       appointment.increaseCapacity(1);
+       appointmentRepository.save(appointment);
+
+       ResponseEntity<Integer> canceledAppointment = clientServiceRestTemplate.exchange("/client/canceledAppointment",
+               HttpMethod.PUT, new HttpEntity<>(clientAppointmentDto.getClientId()), Integer.class);
+
+        NotificationCreateDto nDto = new NotificationCreateDto(clientAppointmentDto.getFirstName(), clientAppointmentDto.getLastName(),
+                clientAppointmentDto.getEmail(), appointment.getHall().getName(), appointment.getDay(), appointment.getStartTime(), clientAppointmentDto.getUsername());
+        jmsTemplate.convertAndSend(canceledAppointmentMessage, messageHelper.createTextMessage(nDto));
+
+        return -appointment.getTrainingCategory().getPrice();
     }
 
 }

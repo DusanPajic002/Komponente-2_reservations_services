@@ -1,10 +1,7 @@
 package com.example.RservationsService.controller;
 
 
-import com.example.RservationsService.dto.AppointmentCreateDto;
-import com.example.RservationsService.dto.AppointmentDto;
-import com.example.RservationsService.dto.ClientAppointmentDto;
-import com.example.RservationsService.dto.FilterDto;
+import com.example.RservationsService.dto.*;
 import com.example.RservationsService.service.AppointmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.Page;
@@ -30,10 +27,15 @@ public class AppointmentController {
         return new ResponseEntity<>(appointmentService.findAllAppointments(id), HttpStatus.OK);
     }
 
-    @Operation(summary = "Get all clients")
+    @Operation(summary = "Filter appointments")
     @PostMapping("/filter")
     public ResponseEntity<List<AppointmentDto>> filterAppointments(@RequestBody FilterDto filterDto) {
         return new ResponseEntity<>(appointmentService.filterAppointments(filterDto), HttpStatus.OK);
+    }
+    @Operation(summary = "Get client appointments")
+    @PostMapping("/getCleintAppointment")
+    public ResponseEntity<List<AppointmentDto>> getCleintAppointment(@RequestBody String clientId) {
+        return new ResponseEntity<>(appointmentService.getCleintAppointment(clientId), HttpStatus.OK);
     }
 
     @Operation(summary = "Update clinet trainings")
@@ -41,6 +43,13 @@ public class AppointmentController {
     public ResponseEntity<Integer> updateClientTrainings(@RequestBody ClientAppointmentDto clientAppointmentDto) {
         return new ResponseEntity<>(appointmentService.updateTrainingCapacity(clientAppointmentDto), HttpStatus.OK);
     }
+    @Operation(summary = "Cancel training")
+    @PostMapping("/cancelAppointment")
+    public ResponseEntity<Integer> cancelAppointment(@RequestBody ClientAppointmentDto clientAppointmentDto) {
+        System.out.println(clientAppointmentDto);
+        return new ResponseEntity<>(appointmentService.cancelAppointment(clientAppointmentDto), HttpStatus.OK);
+    }
+
 
 
 //    @Operation(summary = "Add appointment")

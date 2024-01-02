@@ -52,7 +52,13 @@ public class Appointment {
     public Appointment() {
     }
 
-    public void increaseCapacity() {
-        this.capacity--;
+    public void increaseCapacity(int capacity) {
+        this.capacity = this.capacity + capacity;
+        if(trainingCategory.getType() == "group" && this.capacity > 0 && this.capacity <= 12)
+            availability = true;
+        else if(trainingCategory.getType() == "individual" && this.capacity == 1)
+            availability = true;
+        else if (this.capacity == 0)
+            availability = false;
     }
 }
