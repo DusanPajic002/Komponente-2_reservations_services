@@ -37,16 +37,5 @@ public class Hall {
     public Hall() {
     }
 
-    @Override
-    public String toString() {
-        return "Hall{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", managerID=" + managerID +
-                ", description='" + description + '\'' +
-                ", numberOfTrainers=" + numberOfTrainers +
-                ", trainingCategory=" + trainingCategory +
-                ", appointments=" + appointments +
-                '}';
-    }
+
 }

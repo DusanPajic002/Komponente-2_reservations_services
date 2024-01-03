@@ -2,6 +2,7 @@ package com.example.RservationsService.controller;
 
 import com.example.RservationsService.domain.Hall;
 import com.example.RservationsService.dto.CategoryDto;
+import com.example.RservationsService.dto.EditHallDto;
 import com.example.RservationsService.dto.HallDto;
 import com.example.RservationsService.service.AppointmentService;
 import com.example.RservationsService.service.HallService;
@@ -35,6 +36,12 @@ public class HallController {
     @PutMapping("/setHallManager")
     public ResponseEntity<Integer> setHallManager(@RequestBody HallDto hallDto) {
         return new ResponseEntity<>(hallService.setHallManager(hallDto.getName(), hallDto.getManagerID()), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Set manager for hall")
+    @PutMapping("/editHall")
+    public ResponseEntity<Integer> editHall(@RequestBody EditHallDto editHallDto) {
+        return new ResponseEntity<>(hallService.editHall(editHallDto), HttpStatus.OK);
     }
 
 }

@@ -61,4 +61,5 @@ public class Appointment {
         else if (this.capacity == 0)
             availability = false;
     }
+
 }

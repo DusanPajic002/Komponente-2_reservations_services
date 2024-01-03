@@ -3,6 +3,7 @@ package com.example.RservationsService.service.impl;
 
 import com.example.RservationsService.domain.Appointment;
 import com.example.RservationsService.domain.ClientAppointment;
+import com.example.RservationsService.domain.Hall;
 import com.example.RservationsService.domain.TrainingCategory;
 import com.example.RservationsService.dto.*;
 import com.example.RservationsService.listener.MessageHelper;
@@ -11,6 +12,7 @@ import com.example.RservationsService.mapper.CategoryMapper;
 import com.example.RservationsService.mapper.ClientAppointmentMapper;
 import com.example.RservationsService.repository.AppointmentRepository;
 import com.example.RservationsService.repository.ClientAppointmentRepository;
+import com.example.RservationsService.repository.HallRepository;
 import com.example.RservationsService.repository.TrainingCategoryRepository;
 import com.example.RservationsService.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -45,10 +48,12 @@ public class AppointmentServiceImpl implements AppointmentService {
     private String schedulingMessage;
     private String canceledAppointmentMessage;
 
+    private HallRepository hallRepository;
+
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, TrainingCategoryRepository trainingCategoryRepository, AppointmentMapper appointmentMapper,
                                   CategoryMapper categoryMapper, RestTemplate clientServiceRestTemplate, ClientAppointmentMapper clientAppointmentMapper,
                                   ClientAppointmentRepository clientAppointmentRepository, MessageHelper messageHelper,@Value("${destination.schedulingMessage}") String schedulingMessage,
-                                  @Value("${destination.cancelSchedulingMessage}") String canceledAppointmentMessage) {
+                                  @Value("${destination.cancelSchedulingMessage}") String canceledAppointmentMessage, HallRepository hallRepository) {
         this.appointmentRepository = appointmentRepository;
         this.trainingCategoryRepository = trainingCategoryRepository;
         this.appointmentMapper = appointmentMapper;
@@ -59,6 +64,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.messageHelper = messageHelper;
         this.schedulingMessage = schedulingMessage;
         this.canceledAppointmentMessage = canceledAppointmentMessage;
+        this.hallRepository = hallRepository;
     }
 
     @Override
@@ -158,6 +164,24 @@ public class AppointmentServiceImpl implements AppointmentService {
         jmsTemplate.convertAndSend(canceledAppointmentMessage, messageHelper.createTextMessage(nDto));
 
         return -appointment.getTrainingCategory().getPrice();
+    }
+
+    @Override
+    public List<AppointmentDto> listAppointments(String hallName) {
+        Hall hall = hallRepository.findByName(hallName);
+        List<ClientAppointment> clientAppointments = clientAppointmentRepository.findAll();
+        System.out.println(clientAppointments);
+        //daj mi sve appointmente iz clientAppointments
+        List<Appointment> app =  clientAppointments.stream().map(clientAppointment -> clientAppointment.getAppointment()).collect(Collectors.toList());
+        System.out.println(app);
+        app = app.stream().filter(appointment -> appointment.getHall().getName().equals(hallName)).collect(Collectors.toList());
+        System.out.println(app);
+        if (!app.isEmpty()) {
+            List<AppointmentDto> ad = app.stream().map(appointmentMapper::appointmentToAppointmentDto).collect(Collectors.toList());
+            return ad;
+        } else {
+            return List.of();
+        }
     }
 
 

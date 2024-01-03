@@ -52,12 +52,12 @@ public class TestDataRunner implements CommandLineRunner {
         Appointment appointment3 = new Appointment("14:00", "Wednesday", true, trainingCategory3, hall3);
         Appointment appointment4 = new Appointment("15:00", "Thursday", true, trainingCategory4, hall4);
 
-        Appointment appointment5 = new Appointment("16:00", "Friday", true, trainingCategory1, hall1);
+        Appointment appointment5 = new Appointment("16:00", "Friday", true, trainingCategory2, hall1);
         Appointment appointment6 = new Appointment("17:00", "Saturday", true, trainingCategory2, hall2);
         Appointment appointment7 = new Appointment("18:00", "Sunday", true, trainingCategory3, hall3);
         Appointment appointment8 = new Appointment("19:00", "Monday", true, trainingCategory4, hall4);
 
-        Appointment appointment9 = new Appointment("20:00", "Tuesday", false, trainingCategory1, hall1);
+        Appointment appointment9 = new Appointment("20:00", "Tuesday", false, trainingCategory3, hall1);
         Appointment appointment10 = new Appointment("21:00", "Wednesday", false, trainingCategory2, hall2);
         Appointment appointment11 = new Appointment("22:00", "Thursday", false, trainingCategory3, hall3);
         Appointment appointment12 = new Appointment("23:00", "Friday", false, trainingCategory4, hall4);

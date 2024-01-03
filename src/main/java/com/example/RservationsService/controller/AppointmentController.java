@@ -50,6 +50,13 @@ public class AppointmentController {
         return new ResponseEntity<>(appointmentService.cancelAppointment(clientAppointmentDto), HttpStatus.OK);
     }
 
+    @Operation(summary = "Get notifications by username")
+    @GetMapping("/{hallName}")
+    public ResponseEntity<List<AppointmentDto>> showNotifications(@PathVariable String hallName) {
+        List<AppointmentDto> notificationDtos = appointmentService.listAppointments(hallName);
+        return  new ResponseEntity<>(notificationDtos, HttpStatus.OK);
+    }
+
 
 
 //    @Operation(summary = "Add appointment")

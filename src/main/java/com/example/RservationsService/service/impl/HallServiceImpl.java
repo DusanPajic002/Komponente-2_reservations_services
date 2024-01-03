@@ -2,6 +2,7 @@ package com.example.RservationsService.service.impl;
 
 import com.example.RservationsService.domain.Hall;
 import com.example.RservationsService.dto.CategoryDto;
+import com.example.RservationsService.dto.EditHallDto;
 import com.example.RservationsService.dto.HallDto;
 import com.example.RservationsService.listener.MessageHelper;
 import com.example.RservationsService.mapper.AppointmentMapper;
@@ -11,7 +12,11 @@ import com.example.RservationsService.repository.AppointmentRepository;
 import com.example.RservationsService.repository.ClientAppointmentRepository;
 import com.example.RservationsService.repository.HallRepository;
 import com.example.RservationsService.service.HallService;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,8 +31,12 @@ public class HallServiceImpl implements HallService {
     private HallRepository hallRepository;
     private HallMapper hallMapper;
 
+
+    private RestTemplate clientServiceRestTemplate;
+
     public HallServiceImpl(AppointmentRepository appointmentRepository, MessageHelper messageHelper, AppointmentMapper appointmentMapper, ClientAppointmentMapper clientAppointmentMapper,
-                           ClientAppointmentRepository clientAppointmentRepository, HallRepository hallRepository, HallMapper hallMapper) {
+                           ClientAppointmentRepository clientAppointmentRepository, HallRepository hallRepository, HallMapper hallMapper,
+                           RestTemplate clientServiceRestTemplate) {
         this.appointmentRepository = appointmentRepository;
         this.messageHelper = messageHelper;
         this.appointmentMapper = appointmentMapper;
@@ -35,6 +44,7 @@ public class HallServiceImpl implements HallService {
         this.clientAppointmentRepository = clientAppointmentRepository;
         this.hallRepository = hallRepository;
         this.hallMapper = hallMapper;
+        this.clientServiceRestTemplate = clientServiceRestTemplate;
     }
 
     @Override
@@ -55,6 +65,21 @@ public class HallServiceImpl implements HallService {
             System.out.println(managerID);
             System.out.println(hall.getManagerID());
             System.out.println(hall);
+            hallRepository.save(hall);
+            return 1;
+        }
+        return 0;
+    }
+
+    @Override
+    public Integer editHall(EditHallDto editHallDto) {
+        Hall hall = hallRepository.findByName(editHallDto.getOldHallName());
+        if(hall != null){
+            hall.setName(editHallDto.getHallName());
+            hall.setDescription(editHallDto.getDescription());
+            hall.setNumberOfTrainers(editHallDto.getNumberOfTrainers());
+            clientServiceRestTemplate.exchange("/manager/updateHallName",
+                    HttpMethod.PUT, new HttpEntity<>(new HallDto(editHallDto.getHallName(), editHallDto.getManagerID())), Integer.class);
             hallRepository.save(hall);
             return 1;
         }

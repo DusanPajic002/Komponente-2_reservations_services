@@ -15,5 +15,6 @@ public interface AppointmentService {
     AppointmentDto addAppointment(AppointmentCreateDto appointmentCreateDto);
     List<AppointmentDto> getCleintAppointment (String cleintId);
     int cancelAppointment(ClientAppointmentDto clientAppointmentDto);
+    List<AppointmentDto> listAppointments(String username);
 
 }
