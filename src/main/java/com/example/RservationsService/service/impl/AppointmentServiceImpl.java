@@ -50,10 +50,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private HallRepository hallRepository;
 
+    private String managerCancelSchedulingMessage;
+
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository, TrainingCategoryRepository trainingCategoryRepository, AppointmentMapper appointmentMapper,
                                   CategoryMapper categoryMapper, RestTemplate clientServiceRestTemplate, ClientAppointmentMapper clientAppointmentMapper,
                                   ClientAppointmentRepository clientAppointmentRepository, MessageHelper messageHelper,@Value("${destination.schedulingMessage}") String schedulingMessage,
-                                  @Value("${destination.cancelSchedulingMessage}") String canceledAppointmentMessage, HallRepository hallRepository) {
+                                  @Value("${destination.cancelSchedulingMessage}") String canceledAppointmentMessage, HallRepository hallRepository,
+                                  @Value("${destination.managerCancelSchedulingMessage}") String managerCancelSchedulingMessage) {
         this.appointmentRepository = appointmentRepository;
         this.trainingCategoryRepository = trainingCategoryRepository;
         this.appointmentMapper = appointmentMapper;
@@ -65,6 +68,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.schedulingMessage = schedulingMessage;
         this.canceledAppointmentMessage = canceledAppointmentMessage;
         this.hallRepository = hallRepository;
+        this.managerCancelSchedulingMessage = managerCancelSchedulingMessage;
     }
 
     @Override
@@ -88,7 +92,6 @@ public class AppointmentServiceImpl implements AppointmentService {
         ResponseEntity<Integer> numberOfTrainings = clientServiceRestTemplate.exchange("/client/numberOfTrainings",
                 HttpMethod.PUT, new HttpEntity<>(clientAppointmentDto.getClientId()), Integer.class);
         if (numberOfTrainings.getStatusCode().is2xxSuccessful()){
-            System.out.println(numberOfTrainings.getBody() + " body");
             if((numberOfTrainings.getBody() != null && numberOfTrainings.getBody().equals(-1))){
                 System.out.printf("Client not found");
                 return 0;
@@ -167,22 +170,39 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
-    public List<AppointmentDto> listAppointments(String hallName) {
+    public int managerCancelAppointment(ClientAppointmentDto clientAppointmentDto) {
+        List<ClientAppointment> clientAppointments = clientAppointmentRepository.findByAppointmentID(clientAppointmentDto.getAppointmentId());
+
+        Appointment appointment = appointmentRepository.findById(clientAppointmentDto.getAppointmentId()).orElse(null);
+        //appointment.increaseCapacity(1);
+        appointment.setAvailability(false);
+        for(ClientAppointment ca: clientAppointments){
+            //Long clientId, String managerFirstName, String managerLastName, String hallName, String day, String startTime
+            NotificationFromManagerDto nDto = new NotificationFromManagerDto(ca.getClientID(), clientAppointmentDto.getFirstName(), clientAppointmentDto.getLastName(),
+                    appointment.getHall().getName(), appointment.getDay(), appointment.getStartTime());
+            jmsTemplate.convertAndSend(managerCancelSchedulingMessage, messageHelper.createTextMessage(nDto));
+        }
+        clientAppointmentRepository.deleteAll(clientAppointments);
+        return 0;
+    }
+
+    @Override
+    public Set<AppointmentDto> listAppointments(String hallName) {
         Hall hall = hallRepository.findByName(hallName);
         List<ClientAppointment> clientAppointments = clientAppointmentRepository.findAll();
         System.out.println(clientAppointments);
-        //daj mi sve appointmente iz clientAppointments
-        List<Appointment> app =  clientAppointments.stream().map(clientAppointment -> clientAppointment.getAppointment()).collect(Collectors.toList());
-        System.out.println(app);
-        app = app.stream().filter(appointment -> appointment.getHall().getName().equals(hallName)).collect(Collectors.toList());
+        Set<Appointment> app =  clientAppointments.stream().map(clientAppointment -> clientAppointment.getAppointment()).collect(Collectors.toSet());
+        app = app.stream().filter(appointment -> appointment.getHall().getName().equals(hallName)).collect(Collectors.toSet());
         System.out.println(app);
         if (!app.isEmpty()) {
-            List<AppointmentDto> ad = app.stream().map(appointmentMapper::appointmentToAppointmentDto).collect(Collectors.toList());
+            Set<AppointmentDto> ad = app.stream().map(appointmentMapper::appointmentToAppointmentDto).collect(Collectors.toSet());
             return ad;
         } else {
-            return List.of();
+            return Set.of();
         }
     }
+
+
 
 
 }

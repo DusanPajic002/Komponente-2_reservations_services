@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface AppointmentService {
 
@@ -15,6 +16,8 @@ public interface AppointmentService {
     AppointmentDto addAppointment(AppointmentCreateDto appointmentCreateDto);
     List<AppointmentDto> getCleintAppointment (String cleintId);
     int cancelAppointment(ClientAppointmentDto clientAppointmentDto);
-    List<AppointmentDto> listAppointments(String username);
+    Set<AppointmentDto> listAppointments(String username);
+    int managerCancelAppointment(ClientAppointmentDto clientAppointmentDto);
+
 
 }
