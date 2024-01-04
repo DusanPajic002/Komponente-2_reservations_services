@@ -19,7 +19,6 @@ public class AppointmentDto {
     private String trainingCategory;
     private String trainingType;
     private String hall;
-
     private String hallDescription;
 
 

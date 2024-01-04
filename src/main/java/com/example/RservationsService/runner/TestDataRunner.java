@@ -51,13 +51,12 @@ public class TestDataRunner implements CommandLineRunner {
         Appointment appointment1 = new Appointment("12:00", "Monday", true, trainingCategory1, hall1);
         Appointment appointment2 = new Appointment("13:15", "Monday", true, trainingCategory3, hall1);
         Appointment appointment3 = new Appointment("12:00", "Wednesday", true, trainingCategory4, hall1);
-        Appointment appointment4 = new Appointment("13:15", "Wednesday", true, trainingCategory3, hall1);
-        Appointment appointment5 = new Appointment("12:00", "Friday", true, trainingCategory1, hall1);
         Appointment appointment6 = new Appointment("13:15", "Friday", true, trainingCategory2, hall1);
+
+        Appointment appointment1_1 = new Appointment("13:15", "Thursday", false, trainingCategory3, hall1);
 
         // Halla 2
         Appointment appointment7 = new Appointment("12:00", "Monday", true, trainingCategory1, hall2);
-        Appointment appointment8 = new Appointment("13:15", "Monday", true, trainingCategory3, hall2);
         Appointment appointment9 = new Appointment("12:00", "Tuesday", true, trainingCategory4, hall2);
         Appointment appointment10 = new Appointment("13:15", "Tuesday", true, trainingCategory4, hall2);
         Appointment appointment11 = new Appointment("12:00", "Thursday", true, trainingCategory1, hall2);
@@ -68,16 +67,19 @@ public class TestDataRunner implements CommandLineRunner {
         Appointment appointment14 = new Appointment("13:15", "Tuesday", true, trainingCategory3, hall3);
         Appointment appointment15 = new Appointment("12:00", "Thursday", true, trainingCategory4, hall3);
         Appointment appointment16 = new Appointment("13:15", "Wednesday", true, trainingCategory3, hall3);
-        Appointment appointment17 = new Appointment("12:00", "Friday", true, trainingCategory1, hall3);
         Appointment appointment18 = new Appointment("13:15", "Tuesday", true, trainingCategory2, hall3);
 
         // Halla 4
         Appointment appointment19 = new Appointment("12:00", "Monday", true, trainingCategory1, hall4);
         Appointment appointment20 = new Appointment("13:15", "Monday", true, trainingCategory3, hall4);
         Appointment appointment21 = new Appointment("12:00", "Tuesday", true, trainingCategory4, hall4);
-        Appointment appointment22 = new Appointment("13:15", "Friday", true, trainingCategory4, hall4);
         Appointment appointment23 = new Appointment("12:00", "Thursday", true, trainingCategory1, hall4);
         Appointment appointment24 = new Appointment("13:15", "Friday", true, trainingCategory2, hall4);
+
+        appointmentRepository.saveAll(List.of(appointment1, appointment2, appointment3, appointment6,
+                appointment7, appointment9, appointment10, appointment11, appointment12, appointment13, appointment14,
+                appointment15, appointment16,  appointment18, appointment19, appointment20, appointment21,
+                appointment23, appointment24, appointment1_1));
 
      }
 }

@@ -196,7 +196,6 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     public int managerCancelAppointment(ClientAppointmentDto clientAppointmentDto) {
         List<ClientAppointment> clientAppointments = clientAppointmentRepository.findByAppointmentID(clientAppointmentDto.getAppointmentId());
-
         Appointment appointment = appointmentRepository.findById(clientAppointmentDto.getAppointmentId()).orElse(null);
         appointment.setAvailability(false);
         for(ClientAppointment ca: clientAppointments){
@@ -207,12 +206,23 @@ public class AppointmentServiceImpl implements AppointmentService {
         clientAppointmentRepository.deleteAll(clientAppointments);
         return 0;
     }
+    @Override
+    public int managerAllowAppointment(ClientAppointmentDto clientAppointmentDto) {
+        Appointment appointment = appointmentRepository.findById(clientAppointmentDto.getAppointmentId()).orElse(null);
+        if(appointment == null)
+            return 0;
+        appointment.setAvailability(true);
+        appointmentRepository.save(appointment);
+        return 1;
+    }
 
     @Override
     public Set<AppointmentDto> listAppointments(String hallName) {
         List<ClientAppointment> clientAppointments = clientAppointmentRepository.findAll();
+        List<Appointment> appointments = appointmentRepository.findAllByHallId(hallRepository.findByName(hallName).getId());
         Set<Appointment> app =  clientAppointments.stream().map(clientAppointment -> clientAppointment.getAppointment()).collect(Collectors.toSet());
         app = app.stream().filter(appointment -> appointment.getHall().getName().equals(hallName)).collect(Collectors.toSet());
+        app.addAll(appointments.stream().filter(appoint -> appoint.isAvailability() == false).collect(Collectors.toSet()));
         if (!app.isEmpty()) {
             Set<AppointmentDto> ad = app.stream().map(appointmentMapper::appointmentToAppointmentDto).collect(Collectors.toSet());
             return ad;

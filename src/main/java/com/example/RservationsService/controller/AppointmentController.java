@@ -54,6 +54,12 @@ public class AppointmentController {
     }
 
     @Operation(summary = "Cancel training")
+    @PostMapping("/managerAllowAppointment")
+    public ResponseEntity<Integer> managerAllowAppointment(@RequestBody ClientAppointmentDto clientAppointmentDto) {
+        System.out.println(clientAppointmentDto);
+        return new ResponseEntity<>(appointmentService.managerAllowAppointment(clientAppointmentDto), HttpStatus.OK);
+    }
+    @Operation(summary = "Cancel training")
     @PostMapping("/managerCancelAppointment")
     public ResponseEntity<Integer> managerCancelAppointment(@RequestBody ClientAppointmentDto clientAppointmentDto) {
         System.out.println(clientAppointmentDto);
@@ -66,7 +72,6 @@ public class AppointmentController {
         Set<AppointmentDto> notificationDtos = appointmentService.listAppointments(hallName);
         return  new ResponseEntity<>(notificationDtos, HttpStatus.OK);
     }
-
     @Operation(summary = "New appointment")
     @PostMapping("/newAppointment")
     public ResponseEntity<AppointmentDto> newAppointment(@RequestBody AppointmentCreateDto appointmentCreateDto) {
