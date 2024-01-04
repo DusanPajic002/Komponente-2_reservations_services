@@ -55,16 +55,9 @@ public class HallServiceImpl implements HallService {
 
     @Override
     public Integer setHallManager(String hallName, Long managerID) {
-        System.out.println(hallName);
-        System.out.println(managerID);
         Hall hall = hallRepository.findByName(hallName);
-        System.out.println(hall);
-        System.out.println(hall.getManagerID() + " pre |");
         if(hall != null){
             hall.setManagerID(managerID);
-            System.out.println(managerID);
-            System.out.println(hall.getManagerID());
-            System.out.println(hall);
             hallRepository.save(hall);
             return 1;
         }

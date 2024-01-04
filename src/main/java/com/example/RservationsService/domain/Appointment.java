@@ -16,7 +16,6 @@ public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long ID;
-
     private String startTime;
     @Column(name = "day_of_week")
     private String day;

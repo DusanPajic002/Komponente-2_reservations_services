@@ -33,6 +33,7 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentDto>> filterAppointments(@RequestBody FilterDto filterDto) {
         return new ResponseEntity<>(appointmentService.filterAppointments(filterDto), HttpStatus.OK);
     }
+
     @Operation(summary = "Get client appointments")
     @PostMapping("/getCleintAppointment")
     public ResponseEntity<List<AppointmentDto>> getCleintAppointment(@RequestBody String clientId) {
@@ -44,6 +45,7 @@ public class AppointmentController {
     public ResponseEntity<Integer> updateClientTrainings(@RequestBody ClientAppointmentDto clientAppointmentDto) {
         return new ResponseEntity<>(appointmentService.updateTrainingCapacity(clientAppointmentDto), HttpStatus.OK);
     }
+
     @Operation(summary = "Cancel training")
     @PostMapping("/cancelAppointment")
     public ResponseEntity<Integer> cancelAppointment(@RequestBody ClientAppointmentDto clientAppointmentDto) {
@@ -60,17 +62,16 @@ public class AppointmentController {
 
     @Operation(summary = "Get notifications by username")
     @GetMapping("/{hallName}")
-    public ResponseEntity<Set<AppointmentDto>> showNotifications(@PathVariable String hallName) {
+    public ResponseEntity<Set<AppointmentDto>> managerAppointment(@PathVariable String hallName) {
         Set<AppointmentDto> notificationDtos = appointmentService.listAppointments(hallName);
         return  new ResponseEntity<>(notificationDtos, HttpStatus.OK);
     }
 
-
-
-//    @Operation(summary = "Add appointment")
-//    @PostMapping("/addAppointment")
-//    public ResponseEntity<AppointmentDto> updateClientTrainings(@RequestBody AppointmentCreateDto appointmentCreateDto) {
-//        return new ResponseEntity<>(appointmentService.addAppointment(appointmentCreateDto), HttpStatus.OK);
-//    }
+    @Operation(summary = "New appointment")
+    @PostMapping("/newAppointment")
+    public ResponseEntity<AppointmentDto> newAppointment(@RequestBody AppointmentCreateDto appointmentCreateDto) {
+        System.out.println(appointmentCreateDto);
+        return new ResponseEntity<>(appointmentService.addAppointment(appointmentCreateDto), HttpStatus.OK);
+    }
 
 }

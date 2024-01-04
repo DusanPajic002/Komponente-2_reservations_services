@@ -26,6 +26,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.Time;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -142,7 +143,30 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public AppointmentDto addAppointment(AppointmentCreateDto appointmentCreateDto) {
-        return null;
+        Hall hall = hallRepository.findByManagerID(appointmentCreateDto.getManagerId());
+        TrainingCategory trainingCategory = trainingCategoryRepository.findByCategory(appointmentCreateDto.getCategory());
+        List<Appointment> appointments = appointmentRepository.findAllByHallId(hall.getId());
+        Time desiredStartTime = Time.valueOf(appointmentCreateDto.getTime() + ":00");
+        System.out.println(desiredStartTime);
+        Time desiredEndTime = new Time(desiredStartTime.getTime() + 4500 * 1000);
+        System.out.println(desiredEndTime);
+        for (Appointment a : appointments) {
+            Time appointmentStartTime = Time.valueOf(a.getStartTime() + ":00");
+            Time appointmentEndTime = new Time(appointmentStartTime.getTime() + 4500 * 1000);
+            if (a.getDay().equals(appointmentCreateDto.getDayOfWeek())) {
+                if ((desiredStartTime.before(appointmentEndTime) && desiredStartTime.after(appointmentStartTime)) ||
+                        (desiredEndTime.after(appointmentStartTime) && desiredEndTime.before(appointmentEndTime)) ||
+                        (desiredStartTime.equals(appointmentStartTime))) {
+                    return null;
+                }
+            }
+        }
+
+        Appointment appointment = appointmentMapper.createAppointment(appointmentCreateDto, trainingCategory, hall);
+        System.out.println(appointment);
+        appointmentRepository.save(appointment);
+
+        return appointmentMapper.appointmentToAppointmentDto(appointment);
     }
 
     @Override
@@ -174,10 +198,8 @@ public class AppointmentServiceImpl implements AppointmentService {
         List<ClientAppointment> clientAppointments = clientAppointmentRepository.findByAppointmentID(clientAppointmentDto.getAppointmentId());
 
         Appointment appointment = appointmentRepository.findById(clientAppointmentDto.getAppointmentId()).orElse(null);
-        //appointment.increaseCapacity(1);
         appointment.setAvailability(false);
         for(ClientAppointment ca: clientAppointments){
-            //Long clientId, String managerFirstName, String managerLastName, String hallName, String day, String startTime
             NotificationFromManagerDto nDto = new NotificationFromManagerDto(ca.getClientID(), clientAppointmentDto.getFirstName(), clientAppointmentDto.getLastName(),
                     appointment.getHall().getName(), appointment.getDay(), appointment.getStartTime());
             jmsTemplate.convertAndSend(managerCancelSchedulingMessage, messageHelper.createTextMessage(nDto));
@@ -188,12 +210,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     public Set<AppointmentDto> listAppointments(String hallName) {
-        Hall hall = hallRepository.findByName(hallName);
         List<ClientAppointment> clientAppointments = clientAppointmentRepository.findAll();
-        System.out.println(clientAppointments);
         Set<Appointment> app =  clientAppointments.stream().map(clientAppointment -> clientAppointment.getAppointment()).collect(Collectors.toSet());
         app = app.stream().filter(appointment -> appointment.getHall().getName().equals(hallName)).collect(Collectors.toSet());
-        System.out.println(app);
         if (!app.isEmpty()) {
             Set<AppointmentDto> ad = app.stream().map(appointmentMapper::appointmentToAppointmentDto).collect(Collectors.toSet());
             return ad;

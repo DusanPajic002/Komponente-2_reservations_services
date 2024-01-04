@@ -9,11 +9,13 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+
 public class Hall {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String name;
     private Long managerID = 0L;
     private String description;

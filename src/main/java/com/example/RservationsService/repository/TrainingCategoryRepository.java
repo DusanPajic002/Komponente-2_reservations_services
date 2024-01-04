@@ -4,4 +4,6 @@ import com.example.RservationsService.domain.TrainingCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TrainingCategoryRepository extends JpaRepository<TrainingCategory, Long> {
+
+    TrainingCategory findByCategory(String name);
 }

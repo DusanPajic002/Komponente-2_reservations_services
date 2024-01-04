@@ -18,6 +18,7 @@ public class TrainingCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String category; // powerlifting, pilates, kalistenika, joga, itd
     private int price;
     private String type;
